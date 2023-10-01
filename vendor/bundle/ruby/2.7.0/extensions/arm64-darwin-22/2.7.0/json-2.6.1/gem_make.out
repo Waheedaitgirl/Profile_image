@@ -1,0 +1,13 @@
+current directory: /Users/Developer/Downloads/recruitbpm-employee-mobile-app-d65673d7e197/vendor/bundle/ruby/2.7.0/gems/json-2.6.1/ext/json
+/Users/Developer/.rvm/rubies/ruby-2.7.4/bin/ruby -I /Users/Developer/.rvm/rubies/ruby-2.7.4/lib/ruby/2.7.0 -r ./siteconf20230302-15364-10szrie.rb extconf.rb
+creating Makefile
+
+current directory: /Users/Developer/Downloads/recruitbpm-employee-mobile-app-d65673d7e197/vendor/bundle/ruby/2.7.0/gems/json-2.6.1/ext/json
+make "DESTDIR=" clean
+
+current directory: /Users/Developer/Downloads/recruitbpm-employee-mobile-app-d65673d7e197/vendor/bundle/ruby/2.7.0/gems/json-2.6.1/ext/json
+make "DESTDIR="
+make: Nothing to be done for `all'.
+
+current directory: /Users/Developer/Downloads/recruitbpm-employee-mobile-app-d65673d7e197/vendor/bundle/ruby/2.7.0/gems/json-2.6.1/ext/json
+make "DESTDIR=" install
