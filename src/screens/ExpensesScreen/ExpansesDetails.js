@@ -1,5 +1,5 @@
 import React,{useEffect, useState} from 'react';
-import {Text,SafeAreaView,ActivityIndicator, ScrollView,View,StyleSheet} from 'react-native';
+import {Text,Alert,Image,SafeAreaView,ActivityIndicator, ScrollView,View,StyleSheet, TouchableOpacity} from 'react-native';
 import { commonStyles, textStyles } from '../../styles';
 import CustomHeader from '../../components/CustomHeader';
 import ExpansesItem from './ExpansesCard';
@@ -8,13 +8,24 @@ import { colors } from '../../constants/theme';
 import { AppScreenWidth } from '../../constants/sacling';
 import Spacer from '../../components/Spacer';
 import moment from 'moment';
+import {downloadFile} from '../../helpers';
+import AntDesign from 'react-native-vector-icons/AntDesign';
+import {useNavigation} from '@react-navigation/native';
 import { useSelector } from 'react-redux';
 import { getExpensesDetails } from '../../api';
 import { widthPercentageToDP } from 'react-native-responsive-screen';
 import CustomStatusBar from '../../components/StatusBar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 const Item = ({date, expense_type, bill_type , category, amount , filename, approver_comments,expense_comments }) => {
-   
+    const getFileExtention = fileUrl => {
+        // To get the file extension
+        return /[.]/.exec(fileUrl) ? /[^.]+$/.exec(fileUrl) : undefined;
+      };
+      const navigation = useNavigation();
+      const [ext, setExt] = useState(null);
+      useEffect(() => {
+        setExt(getFileExtention(filename));
+      }, []);
     return(
         <View style={styles.CardView}>
         <View style={styles.row}>
@@ -46,8 +57,92 @@ const Item = ({date, expense_type, bill_type , category, amount , filename, appr
                 <Text includeFontPadding={false} style={styles.ButtonText} >${amount}</Text>
             </View>
             <View>
-                <Text style={styles.buleText} >File name:</Text>
-                <Text ellipsizeMode={"middle"} numberOfLines={1} style={{...styles.title, width:widthPercentageToDP(40)}} >{filename}</Text>
+            <Text style={styles.buleText}>Receipt:</Text>
+            {/* <Text style={styles.title}>{filename}</Text>   */}
+
+            <TouchableOpacity
+              disabled={!filename}
+              style={styles.title}
+              onPress={() => {
+                if (
+                  ext == 'png' ||
+                  ext == 'jpg' ||
+                  ext == 'gif' ||
+                  ext == 'jpeg' ||
+                  ext == 'webp'
+                ) {
+                  console.log('filename', filename);
+                  navigation.navigate('Preview', {
+                    file: filename,
+                  });
+                } else {
+                  if (
+                    ext == 'doc' ||
+                    ext == 'docx' ||
+                    ext == 'pdf' ||
+                    ext == 'rtf'
+                  ) {
+                    let url = filename;
+                    Alert.alert(
+                      'Attention!',
+                      'Do you want to download the file?',
+                      [
+                        {
+                          text: 'Cancel',
+                          onPress: () => {},
+                          style: 'cancel',
+                        },
+                        {
+                          text: 'Download',
+                          onPress: () => {
+                            downloadFile(url);
+                          },
+                        },
+                      ],
+                    );
+                  } else {
+                    null;
+                  }
+                }
+                // navigation.navigate('ImageView', {
+                //   file: filename,
+                // });
+              }}>
+              {/* <Image
+                style={styles.imageStyle}
+                source={{
+                  uri: filename,
+                }}
+              /> */}
+              {ext == 'pdf' ? (
+                <AntDesign
+                  name={'pdffile1'}
+                  color={'red'}
+                  size={30}
+                  style={{margin: 6}}
+                />
+              ) : ext == 'png' ||
+                ext == 'jpg' ||
+                ext == 'gif' ||
+                ext == 'jpeg' ||
+                ext == 'webp' ? (
+                <Image style={styles.imageStyle} source={{uri: filename}} />
+              ) : ext == 'doc' ||
+                ext == 'docx' ||
+                ext == 'rtf' ||
+                ext == 'txt' ? (
+                <AntDesign
+                  name={'wordfile1'}
+                  color={'blue'}
+                  size={30}
+                  style={{margin: 6}}
+                />
+              ) : (
+                <Text>No receipt available!</Text>
+              )}
+            </TouchableOpacity>
+                {/* <Text style={styles.buleText} >File name:</Text> */}
+                {/* <Text ellipsizeMode={"middle"} numberOfLines={1} style={{...styles.title, width:widthPercentageToDP(40)}} >{filename}</Text> */}
             </View>
         </View>
         {
@@ -170,8 +265,17 @@ const Item = ({date, expense_type, bill_type , category, amount , filename, appr
                                         amount={item.expense_amount} 
                                         approver_comments={item.approver_comments}
                                         expense_comments={item.expense_comments}
-                                        filename={item.expense_receipt}
-                                    />
+                                        // filename={item.expense_receipt}
+                                        filename={
+                                            item.expense_receipt != null
+                                              ? 'https://storage.googleapis.com/recruitbpm-document/' +
+                                                item.subdomain +
+                                                '/' +
+                                                item.expense_receipt
+                                              : null
+                                          }
+                                        />
+                                  
                                 </View>
                             )
                         })}
@@ -193,6 +297,10 @@ const styles = StyleSheet.create({
     row:{
         flexDirection:"row", 
     },
+    imageStyle: {
+        width: 50,
+        height: 50,
+      },
     CardView:{
         elevation:2,
         alignSelf:"center",
